@@ -88,6 +88,18 @@ export async function runDailyMatching(date?: string): Promise<MatchingResult> {
     .in('user_id', unmatched)
   console.log('[matching] user_sports rows:', userSportsRows?.length ?? 0, userSportsRows)
 
+  // 3b. City data for proximity-based grouping
+  const { data: profileRows } = await db
+    .from('profiles')
+    .select('id, city')
+    .in('id', unmatched)
+
+  const cityMap = new Map<string, string>()
+  for (const p of profileRows ?? []) {
+    if (p.city) cityMap.set(p.id as string, p.city as string)
+  }
+  console.log('[matching] Users with city:', cityMap.size)
+
   // 4. Sports catalogue (min/max player counts)
   const { data: sportsRows, error: sportsError } = await db
     .from('sports')
@@ -130,51 +142,70 @@ export async function runDailyMatching(date?: string): Promise<MatchingResult> {
 
     console.log('[matching] Processing sport:', sport.name, '| sportId:', sportId, '| candidates:', candidates)
 
-    // Filter already matched in this run, then shuffle
-    const pool = shuffle(candidates.filter((id) => !matchedThisRun.has(id)))
-    console.log('[matching] Sport:', sport.name, '| pool size:', pool.length)
-    if (pool.length < sport.min_players) continue
+    const eligible = candidates.filter((id) => !matchedThisRun.has(id))
 
-    let cursor = 0
+    // Cluster by city; users with no city go into a fallback bucket
+    const cityBuckets = new Map<string, string[]>()
+    const noCityBucket: string[] = []
+    for (const id of eligible) {
+      const city = cityMap.get(id)
+      if (city) {
+        const bucket = cityBuckets.get(city) ?? []
+        bucket.push(id)
+        cityBuckets.set(city, bucket)
+      } else {
+        noCityBucket.push(id)
+      }
+    }
+    const clusters = [...cityBuckets.values(), ...(noCityBucket.length > 0 ? [noCityBucket] : [])]
+    console.log('[matching] Sport:', sport.name, '| city clusters:', clusters.map((c) => c.length))
+
     let sportGroups = 0
     let sportMembers = 0
 
-    while (cursor < pool.length) {
-      const size = Math.min(sport.max_players, pool.length - cursor)
-      console.log('[matching] While loop:', sport.name, '| cursor:', cursor, '| size:', size, '| min_players:', sport.min_players)
-      if (size < sport.min_players) {
-        console.log('[matching] Breaking — size < min_players:', size, '<', sport.min_players)
-        break
+    for (const cluster of clusters) {
+      // Re-filter in case a user was matched in a previous cluster this sport iteration
+      const pool = shuffle(cluster.filter((id) => !matchedThisRun.has(id)))
+      if (pool.length < sport.min_players) continue
+
+      let cursor = 0
+      while (cursor < pool.length) {
+        const size = Math.min(sport.max_players, pool.length - cursor)
+        console.log('[matching] While loop:', sport.name, '| cursor:', cursor, '| size:', size, '| min_players:', sport.min_players)
+        if (size < sport.min_players) {
+          console.log('[matching] Breaking — size < min_players:', size, '<', sport.min_players)
+          break
+        }
+
+        const groupUsers = pool.slice(cursor, cursor + size)
+        cursor += size
+
+        // Random captain
+        const captainId = groupUsers[Math.floor(Math.random() * groupUsers.length)]
+        console.log('[matching] Attempting group insert:', { sport: sport.name, captainId, groupUsers, event_date: today })
+
+        // Insert group — trigger auto-adds captain as confirmed member
+        const { data: group, error: groupErr } = await db
+          .from('groups')
+          .insert({ sport_id: sportId, captain_id: captainId, event_date: today })
+          .select('id')
+          .single()
+
+        console.log('[matching] Group insert result:', { group, error: groupErr })
+        if (groupErr || !group) continue
+
+        // Insert remaining members
+        const nonCaptains = groupUsers.filter((id) => id !== captainId)
+        if (nonCaptains.length > 0) {
+          await db
+            .from('group_members')
+            .insert(nonCaptains.map((uid) => ({ group_id: group.id, user_id: uid, confirmed: true })))
+        }
+
+        groupUsers.forEach((id) => matchedThisRun.add(id))
+        sportGroups++
+        sportMembers += groupUsers.length
       }
-
-      const groupUsers = pool.slice(cursor, cursor + size)
-      cursor += size
-
-      // Random captain
-      const captainId = groupUsers[Math.floor(Math.random() * groupUsers.length)]
-      console.log('[matching] Attempting group insert:', { sport: sport.name, captainId, groupUsers, event_date: today })
-
-      // Insert group — trigger auto-adds captain as confirmed member
-      const { data: group, error: groupErr } = await db
-        .from('groups')
-        .insert({ sport_id: sportId, captain_id: captainId, event_date: today })
-        .select('id')
-        .single()
-
-      console.log('[matching] Group insert result:', { group, error: groupErr })
-      if (groupErr || !group) continue
-
-      // Insert remaining members
-      const nonCaptains = groupUsers.filter((id) => id !== captainId)
-      if (nonCaptains.length > 0) {
-        await db
-          .from('group_members')
-          .insert(nonCaptains.map((uid) => ({ group_id: group.id, user_id: uid, confirmed: true })))
-      }
-
-      groupUsers.forEach((id) => matchedThisRun.add(id))
-      sportGroups++
-      sportMembers += groupUsers.length
     }
 
     if (sportGroups > 0) {

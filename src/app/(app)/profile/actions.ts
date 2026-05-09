@@ -16,6 +16,7 @@ export type ProfilePayload = {
   bio?: string
   skill_level: SkillLevel
   sport_selections: { sport_id: string; skill_level: SkillLevel }[]
+  city?: string
 }
 
 type ActionResult = { error: string } | undefined
@@ -35,6 +36,7 @@ async function writeProfile(
       ...(payload.username ? { username: payload.username } : {}),
       bio: payload.bio ?? null,
       skill_level: payload.skill_level,
+      city: payload.city ?? null,
     })
     .eq('id', user.id)
 
