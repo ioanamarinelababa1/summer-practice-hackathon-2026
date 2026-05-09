@@ -81,8 +81,9 @@ export default async function GroupDetailPage({
       <div className="max-w-lg mx-auto space-y-6">
 
         {/* Back */}
-        <Link href="/groups" className="text-sm text-gray-500 hover:text-gray-700">
-          ← My Groups
+        <Link href="/groups" className="group inline-flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-green-600 transition-all duration-200">
+          <span className="transition-transform duration-200 group-hover:-translate-x-0.5">←</span>
+          My Groups
         </Link>
 
         {/* Group header */}
@@ -116,7 +117,7 @@ export default async function GroupDetailPage({
 
           <Link
             href={`/groups/${id}/chat`}
-            className="flex items-center justify-center gap-2 w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 transition-colors"
+            className="flex items-center justify-center gap-2 w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
           >
             💬 Open Chat
           </Link>

@@ -28,7 +28,55 @@ function formatTodayHeading(): string {
 
 // ── Sport count types ────────────────────────────────────────────────────────
 
-type SportCount = { id: string; name: string; icon: string | null; count: number }
+type SportCount = {
+  id: string
+  name: string
+  icon: string | null
+  count: number
+  userIds: string[]
+}
+
+// ── Avatar cluster ───────────────────────────────────────────────────────────
+
+function AvatarCluster({
+  userIds,
+  usernameMap,
+  total,
+}: {
+  userIds: string[]
+  usernameMap: Map<string, string>
+  total: number
+}) {
+  const shown = userIds.slice(0, 3)
+  const overflow = total - shown.length
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex -space-x-1.5">
+        {shown.map((uid) => {
+          const initial = (usernameMap.get(uid) ?? '?').charAt(0).toUpperCase()
+          return (
+            <div
+              key={uid}
+              title={usernameMap.get(uid)}
+              className="h-6 w-6 rounded-full bg-green-500 ring-2 ring-white flex items-center justify-center text-[10px] font-bold text-white shrink-0"
+            >
+              {initial}
+            </div>
+          )
+        })}
+        {overflow > 0 && (
+          <div className="h-6 w-6 rounded-full bg-gray-100 ring-2 ring-white flex items-center justify-center text-[9px] font-medium text-gray-500 shrink-0">
+            +{overflow}
+          </div>
+        )}
+      </div>
+      <span className="animate-count-pulse text-sm font-bold text-green-600 tabular-nums">
+        {total}
+      </span>
+    </div>
+  )
+}
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
@@ -42,10 +90,8 @@ export default async function DashboardPage() {
 
   const today = isoDate(0)
 
-  // Dates for the weekly picker (tomorrow + 6 more = 7 days)
   const weekDates = Array.from({ length: 7 }, (_, i) => isoDate(i + 1))
 
-  // Fetch all data in parallel
   const [
     { data: todayRow },
     { data: weekRows },
@@ -70,7 +116,6 @@ export default async function DashboardPage() {
       .neq('user_id', user.id),
   ])
 
-  // Build week slots
   const availMap = new Map((weekRows ?? []).map((r) => [r.date, r.is_available as boolean]))
   const weekSlots: DaySlot[] = weekDates.map((date, i) => ({
     date,
@@ -78,15 +123,25 @@ export default async function DashboardPage() {
     isAvailable: availMap.has(date) ? availMap.get(date)! : null,
   }))
 
-  // Build sport counts from users available today
   const availableUserIds = (availableToday ?? []).map((r) => r.user_id)
   let sportCounts: SportCount[] = []
+  const usernameMap = new Map<string, string>()
 
   if (availableUserIds.length > 0) {
-    const { data: userSportsData } = await supabase
-      .from('user_sports')
-      .select('user_id, sport_id, sports(id, name, icon)')
-      .in('user_id', availableUserIds)
+    const [{ data: userSportsData }, { data: profilesData }] = await Promise.all([
+      supabase
+        .from('user_sports')
+        .select('user_id, sport_id, sports(id, name, icon)')
+        .in('user_id', availableUserIds),
+      supabase
+        .from('profiles')
+        .select('id, username')
+        .in('id', availableUserIds),
+    ])
+
+    for (const p of profilesData ?? []) {
+      usernameMap.set(p.id as string, p.username as string)
+    }
 
     const countMap = new Map<string, SportCount>()
     for (const row of userSportsData ?? []) {
@@ -99,8 +154,15 @@ export default async function DashboardPage() {
       const entry = countMap.get(sport.id)
       if (entry) {
         entry.count++
+        entry.userIds.push(row.user_id)
       } else {
-        countMap.set(sport.id, { id: sport.id, name: sport.name, icon: sport.icon, count: 1 })
+        countMap.set(sport.id, {
+          id: sport.id,
+          name: sport.name,
+          icon: sport.icon,
+          count: 1,
+          userIds: [row.user_id],
+        })
       }
     }
     sportCounts = Array.from(countMap.values()).sort((a, b) => b.count - a.count)
@@ -132,15 +194,17 @@ export default async function DashboardPage() {
               {sportCounts.map((s) => (
                 <div
                   key={s.id}
-                  className="flex items-center gap-2 rounded-lg bg-gray-50 px-3 py-2"
+                  className="flex items-center justify-between gap-2 rounded-lg bg-green-50 border border-green-100 px-3 py-2.5"
                 >
-                  {s.icon && <span className="text-xl">{s.icon}</span>}
-                  <div>
-                    <p className="text-sm font-medium text-gray-800">{s.name}</p>
-                    <p className="text-xs text-gray-500">
-                      {s.count} {s.count === 1 ? 'person' : 'people'}
-                    </p>
+                  <div className="flex items-center gap-2 min-w-0">
+                    {s.icon && <span className="text-xl shrink-0">{s.icon}</span>}
+                    <p className="text-sm font-medium text-gray-800 truncate">{s.name}</p>
                   </div>
+                  <AvatarCluster
+                    userIds={s.userIds}
+                    usernameMap={usernameMap}
+                    total={s.count}
+                  />
                 </div>
               ))}
             </div>

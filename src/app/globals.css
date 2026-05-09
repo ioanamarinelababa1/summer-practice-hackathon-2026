@@ -14,6 +14,8 @@
   --animate-fade-in-up-delay: fade-in-up 0.7s 0.18s ease-out both;
   --animate-fade-in-up-late: fade-in-up 0.7s 0.35s ease-out both;
   --animate-float: float 4s ease-in-out infinite;
+  --animate-count-pulse: count-pulse 2.8s ease-in-out infinite;
+  --animate-stagger-in: stagger-in 0.35s ease-out both;
 }
 
 @keyframes fade-in-up {
@@ -30,6 +32,22 @@
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-8px); }
+}
+
+@keyframes count-pulse {
+  0%, 100% { transform: scale(1); }
+  45%       { transform: scale(1.25); }
+  65%       { transform: scale(1.1); }
+}
+
+@keyframes stagger-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes underline-in {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
 }
 
 @media (prefers-color-scheme: dark) {

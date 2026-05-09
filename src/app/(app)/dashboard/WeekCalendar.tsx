@@ -37,7 +37,7 @@ export default function WeekCalendar({ days }: { days: DaySlot[] }) {
             <button
               onClick={() => toggle(day.date, day.isAvailable)}
               disabled={isPending}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 ${
                 isAvail === true
                   ? 'bg-green-100 text-green-700 hover:bg-green-200'
                   : isAvail === false

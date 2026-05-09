@@ -47,7 +47,7 @@ export default function JoinLeaveButton({
         <button
           onClick={handleLeave}
           disabled={isPending}
-          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200"
         >
           {isPending ? 'Leaving…' : 'Leave Event'}
         </button>
@@ -55,7 +55,7 @@ export default function JoinLeaveButton({
         <button
           onClick={handleJoin}
           disabled={isPending}
-          className="w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 transition-colors"
+          className="w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200"
         >
           {isPending ? 'Joining…' : 'Join Event'}
         </button>

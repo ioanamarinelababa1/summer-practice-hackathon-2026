@@ -146,7 +146,7 @@ export default function EditEventForm({
       <button
         type="submit"
         disabled={submitting || !title.trim()}
-        className="w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 transition-colors"
+        className="w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200"
       >
         {submitting ? 'Saving…' : 'Save Changes'}
       </button>

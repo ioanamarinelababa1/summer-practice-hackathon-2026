@@ -126,7 +126,7 @@ export default function OnboardingForm({
             type="button"
             onClick={handleDetectSports}
             disabled={detecting || !bio.trim()}
-            className="text-xs font-medium text-green-700 border border-green-300 rounded-md px-2.5 py-1 hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="text-xs font-medium text-green-700 border border-green-300 rounded-md px-2.5 py-1 hover:bg-green-50 hover:scale-[1.03] active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
           >
             {detecting ? 'Detecting…' : 'Auto-detect sports'}
           </button>
@@ -178,28 +178,47 @@ export default function OnboardingForm({
         </select>
       </div>
 
-      {/* Sports */}
+      {/* Sports — staggered animation + selected green bg */}
       {sports.length > 0 && (
         <div>
           <p className="block text-sm font-medium text-gray-700 mb-2">
             Sports <span className="text-gray-400 font-normal">(optional)</span>
           </p>
           <ul className="space-y-2">
-            {sports.map((sport) => (
-              <li key={sport.id} className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  id={`sport-${sport.id}`}
-                  checked={selectedSports.has(sport.id)}
-                  onChange={() => toggleSport(sport.id)}
-                  className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
-                />
-                <label htmlFor={`sport-${sport.id}`} className="text-sm text-gray-800 cursor-pointer">
-                  {sport.icon && <span className="mr-1">{sport.icon}</span>}
-                  {sport.name}
-                </label>
-              </li>
-            ))}
+            {sports.map((sport, idx) => {
+              const selected = selectedSports.has(sport.id)
+              return (
+                <li
+                  key={sport.id}
+                  className="animate-stagger-in"
+                  style={{ animationDelay: `${idx * 40}ms` }}
+                >
+                  <label
+                    htmlFor={`sport-${sport.id}`}
+                    className={`flex items-center gap-3 rounded-lg border px-4 py-2.5 cursor-pointer transition-all duration-200 hover:scale-[1.01] ${
+                      selected
+                        ? 'border-green-400 bg-green-50 shadow-sm'
+                        : 'border-gray-200 bg-white hover:border-green-200 hover:bg-green-50/40'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      id={`sport-${sport.id}`}
+                      checked={selected}
+                      onChange={() => toggleSport(sport.id)}
+                      className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 shrink-0"
+                    />
+                    <span className="flex items-center gap-2 text-sm font-medium text-gray-800 select-none">
+                      {sport.icon && <span className="text-base">{sport.icon}</span>}
+                      {sport.name}
+                    </span>
+                    {selected && (
+                      <span className="ml-auto text-xs font-semibold text-green-600">✓</span>
+                    )}
+                  </label>
+                </li>
+              )
+            })}
           </ul>
         </div>
       )}
@@ -213,7 +232,7 @@ export default function OnboardingForm({
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 transition-colors"
+        className="w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200"
       >
         {submitting ? 'Saving…' : 'Save and continue'}
       </button>

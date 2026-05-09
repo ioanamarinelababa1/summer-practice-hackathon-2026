@@ -151,8 +151,9 @@ export default async function EventDetailPage({
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       <div className="max-w-lg mx-auto space-y-6">
         {/* Back */}
-        <Link href="/events" className="text-sm text-gray-500 hover:text-gray-700">
-          ← Events
+        <Link href="/events" className="group inline-flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-green-600 transition-all duration-200">
+          <span className="transition-transform duration-200 group-hover:-translate-x-0.5">←</span>
+          Events
         </Link>
 
         {/* Header card */}
@@ -186,7 +187,7 @@ export default async function EventDetailPage({
           {isCaptain && (
             <Link
               href={`/events/${id}/edit`}
-              className="block text-center w-full rounded-lg border border-green-600 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-50 transition-colors"
+              className="block text-center w-full rounded-lg border border-green-600 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
             >
               Edit Event
             </Link>

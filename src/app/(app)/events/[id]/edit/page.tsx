@@ -54,7 +54,8 @@ export default async function EditEventPage({
       <div className="max-w-lg mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Edit Event</h1>
-          <Link href={`/events/${id}`} className="text-sm text-gray-500 hover:text-gray-700">
+          <Link href={`/events/${id}`} className="group inline-flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-green-600 transition-all duration-200">
+            <span className="transition-transform duration-200 group-hover:-translate-x-0.5">←</span>
             Cancel
           </Link>
         </div>

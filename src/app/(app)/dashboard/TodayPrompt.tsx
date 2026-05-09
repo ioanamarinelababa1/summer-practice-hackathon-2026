@@ -65,14 +65,14 @@ export default function TodayPrompt({
         <button
           onClick={() => handleSet(true)}
           disabled={isPending}
-          className="flex-1 max-w-[160px] rounded-xl bg-green-600 py-4 text-lg font-bold text-white hover:bg-green-700 disabled:opacity-50 transition-colors"
+          className="flex-1 max-w-[160px] rounded-xl bg-green-600 py-4 text-lg font-bold text-white hover:bg-green-700 hover:scale-[1.03] active:scale-[0.97] disabled:opacity-50 transition-all duration-200"
         >
           YES
         </button>
         <button
           onClick={() => handleSet(false)}
           disabled={isPending}
-          className="flex-1 max-w-[160px] rounded-xl border border-gray-300 py-4 text-lg font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+          className="flex-1 max-w-[160px] rounded-xl border border-gray-300 py-4 text-lg font-bold text-gray-700 hover:bg-gray-50 hover:scale-[1.03] active:scale-[0.97] disabled:opacity-50 transition-all duration-200"
         >
           NO
         </button>

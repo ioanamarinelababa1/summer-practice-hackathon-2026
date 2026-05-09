@@ -140,7 +140,7 @@ export default async function EventsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Events</h1>
           <Link
             href="/events/create"
-            className="rounded-lg bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 transition-colors"
+            className="rounded-lg bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200"
           >
             + Create
           </Link>
@@ -156,7 +156,7 @@ export default async function EventsPage() {
         ) : (
           <ul className="space-y-4">
             {events.map((e) => (
-              <li key={e.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 space-y-3">
+              <li key={e.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 space-y-3 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-green-100">
                 {/* Sport + title row */}
                 <div className="flex items-start justify-between gap-2">
                   <div>

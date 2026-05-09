@@ -77,8 +77,9 @@ export default async function GroupsPage() {
       <div className="max-w-lg mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">My Groups</h1>
-          <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-700">
-            ← Dashboard
+          <Link href="/dashboard" className="group inline-flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-green-600 transition-all duration-200">
+            <span className="transition-transform duration-200 group-hover:-translate-x-0.5">←</span>
+            Dashboard
           </Link>
         </div>
 
@@ -101,7 +102,7 @@ export default async function GroupsPage() {
               <li key={g.id}>
                 <Link
                   href={`/groups/${g.id}`}
-                  className="flex items-center justify-between bg-white rounded-xl border border-gray-200 shadow-sm px-5 py-4 hover:border-green-300 transition-colors"
+                  className="flex items-center justify-between bg-white rounded-xl border border-gray-200 shadow-sm px-5 py-4 hover:border-green-200 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {g.sport_icon && (
