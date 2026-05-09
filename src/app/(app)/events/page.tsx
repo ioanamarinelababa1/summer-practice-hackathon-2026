@@ -48,7 +48,32 @@ export default async function EventsPage() {
     max_players: number
     member_count: number
     is_member: boolean
+    city_match: boolean
+    captain_city: string | null
   }
+
+  const captainIds = [...new Set((openGroups ?? []).map((g) => g.captain_id as string))]
+  console.log('[events] captainIds:', captainIds)
+
+  const { data: userProfile } = await userClient
+    .from('profiles')
+    .select('city')
+    .eq('id', user.id)
+    .single()
+
+  const { data: captainProfiles, error: captainProfilesError } = captainIds.length > 0
+    ? await db.from('profiles').select('id, city').in('id', captainIds)
+    : { data: [], error: null }
+
+  console.log('[events] captainProfiles raw:', captainProfiles, '| error:', captainProfilesError)
+
+  const userCity: string | null = (userProfile as { city: string | null } | null)?.city ?? null
+  const captainCityMap = new Map(
+    ((captainProfiles ?? []) as { id: string; city: string | null }[]).map((p) => [p.id, p.city]),
+  )
+
+  console.log('[events] userCity:', userCity)
+  console.log('[events] captainCityMap:', Object.fromEntries(captainCityMap))
 
   let events: EventItem[] = []
 
@@ -79,6 +104,7 @@ export default async function EventsPage() {
         const g = groupMap.get(e.group_id as string)
         if (!g) return null
         const sport = Array.isArray(g.sports) ? g.sports[0] : g.sports
+        const captainCity = captainCityMap.get(g.captain_id as string) ?? null
         return {
           id: e.id as string,
           title: e.title as string,
@@ -91,9 +117,20 @@ export default async function EventsPage() {
           max_players: (sport as { max_players: number } | null)?.max_players ?? 0,
           member_count: memberCountMap.get(e.group_id as string) ?? 0,
           is_member: userGroupSet.has(e.group_id as string),
+          city_match: Boolean(userCity && captainCity && userCity === captainCity),
+          captain_city: captainCity,
         }
       })
+      .map((e) => {
+        if (e) console.log(`[events] event "${e.title}": captain_city=${e.captain_city}, city_match=${e.city_match}`)
+        return e
+      })
       .filter((e): e is EventItem => e !== null)
+      .sort((a, b) => {
+        if (a.city_match && !b.city_match) return -1
+        if (!a.city_match && b.city_match) return 1
+        return 0
+      })
   }
 
   return (
@@ -126,6 +163,16 @@ export default async function EventsPage() {
                     <div className="flex items-center gap-1.5 mb-0.5">
                       {e.sport_icon && <span className="text-sm">{e.sport_icon}</span>}
                       <span className="text-xs text-gray-400">{e.sport_name}</span>
+                      {e.captain_city && (
+                        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
+                          {e.captain_city}
+                        </span>
+                      )}
+                      {e.city_match && (
+                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                          City Match
+                        </span>
+                      )}
                     </div>
                     <h2 className="text-base font-semibold text-gray-900">{e.title}</h2>
                   </div>

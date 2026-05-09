@@ -7,6 +7,19 @@ export type SportOption = { id: string; name: string; icon: string | null }
 
 const SKILL_LEVELS: SkillLevel[] = ['beginner', 'intermediate', 'advanced']
 
+const CITIES = [
+  'Timișoara',
+  'Cluj-Napoca',
+  'Alba-Iulia',
+  'București',
+  'Craiova',
+  'Iași',
+  'Galați',
+  'Arad',
+  'Oradea',
+  'Târgu-Jiu',
+]
+
 export default function OnboardingForm({
   sports,
   currentUsername,
@@ -22,6 +35,7 @@ export default function OnboardingForm({
   const [bio, setBio] = useState(currentBio ?? '')
   const [skillLevel, setSkillLevel] = useState<SkillLevel>(currentSkillLevel ?? 'beginner')
   const [selectedSports, setSelectedSports] = useState<Set<string>>(new Set())
+  const [city, setCity] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [detecting, setDetecting] = useState(false)
@@ -74,6 +88,7 @@ export default function OnboardingForm({
         sport_id,
         skill_level: skillLevel,
       })),
+      city: city || undefined,
     })
     if (result?.error) {
       setError(result.error)
@@ -122,6 +137,24 @@ export default function OnboardingForm({
           placeholder="Tell others a bit about yourself…"
           className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
         />
+      </div>
+
+      {/* City */}
+      <div>
+        <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
+          City <span className="text-gray-400 font-normal">(optional)</span>
+        </label>
+        <select
+          id="city"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+        >
+          <option value="">Select your city</option>
+          {CITIES.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
       </div>
 
       {/* Skill level */}

@@ -41,6 +41,12 @@ export async function createEvent(
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) return { error: 'Not authenticated' }
 
+  const { data: captainProfile } = await supabase
+    .from('profiles')
+    .select('city')
+    .eq('id', user.id)
+    .single()
+
   const { data: group, error: groupError } = await supabase
     .from('groups')
     .insert({
@@ -49,6 +55,7 @@ export async function createEvent(
       status: 'open',
       event_date: payload.scheduled_at.split('T')[0],
       location: payload.location || null,
+      city: (captainProfile as { city: string | null } | null)?.city ?? null,
     })
     .select('id')
     .single()
