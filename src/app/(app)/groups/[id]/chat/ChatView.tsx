@@ -108,17 +108,17 @@ export default function ChatView({
     if (result.error) {
       setError(result.error)
       setInput(trimmed) // restore so the user can retry
-    } else {
+    } else if (result.message) {
       setMessages((prev) => {
-        if (prev.some((m) => m.id === result.message?.id)) return prev
+        if (prev.some((m) => m.id === result.message!.id)) return prev
         return [
           ...prev,
           {
-            id: result.message.id,
+            id: result.message!.id,
             content: trimmed,
-            created_at: result.message.created_at,
-            user_id: result.message.user_id,
-            username: memberUsernames[result.message.user_id] ?? 'Unknown',
+            created_at: result.message!.created_at,
+            user_id: result.message!.user_id,
+            username: memberUsernames[result.message!.user_id] ?? 'Unknown',
           },
         ]
       })
