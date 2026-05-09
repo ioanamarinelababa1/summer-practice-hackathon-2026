@@ -83,7 +83,7 @@ export async function joinGroup(
 
   const { error } = await supabase
     .from('group_members')
-    .insert({ group_id: groupId, user_id: user.id, confirmed: true })
+    .upsert({ group_id: groupId, user_id: user.id, confirmed: true }, { onConflict: 'group_id,user_id', ignoreDuplicates: true })
 
   if (error) return { error: error.message }
 

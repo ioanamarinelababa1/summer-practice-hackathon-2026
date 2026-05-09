@@ -24,6 +24,31 @@ export default function OnboardingForm({
   const [selectedSports, setSelectedSports] = useState<Set<string>>(new Set())
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [detecting, setDetecting] = useState(false)
+
+  async function handleDetectSports() {
+    if (!bio.trim()) return
+    setDetecting(true)
+    try {
+      const res = await fetch('/api/detect-sports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bio }),
+      })
+      if (!res.ok) return
+      const { sports: detected }: { sports: string[] } = await res.json()
+      const matchedIds = sports
+        .filter((s) => detected.some((d) => d.toLowerCase() === s.name.toLowerCase()))
+        .map((s) => s.id)
+      setSelectedSports((prev) => {
+        const next = new Set(prev)
+        matchedIds.forEach((id) => next.add(id))
+        return next
+      })
+    } finally {
+      setDetecting(false)
+    }
+  }
 
   function toggleSport(id: string) {
     setSelectedSports((prev) => {
@@ -76,9 +101,19 @@ export default function OnboardingForm({
 
       {/* Bio */}
       <div>
-        <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-1">
-          Bio <span className="text-gray-400 font-normal">(optional)</span>
-        </label>
+        <div className="flex items-center justify-between mb-1">
+          <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
+            Bio <span className="text-gray-400 font-normal">(optional)</span>
+          </label>
+          <button
+            type="button"
+            onClick={handleDetectSports}
+            disabled={detecting || !bio.trim()}
+            className="text-xs font-medium text-gray-600 border border-gray-300 rounded-md px-2.5 py-1 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            {detecting ? 'Detecting…' : 'Auto-detect sports'}
+          </button>
+        </div>
         <textarea
           id="bio"
           rows={3}
