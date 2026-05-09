@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { logout } from './actions'
 
 const SKILL_LABELS = {
   beginner: 'Beginner',
@@ -46,12 +47,22 @@ export default async function ProfilePage() {
                 </p>
               </div>
             </div>
-            <Link
-              href="/profile/edit"
-              className="shrink-0 rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              Edit
-            </Link>
+            <div className="flex items-center gap-2 shrink-0">
+              <Link
+                href="/profile/edit"
+                className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Edit
+              </Link>
+              <form action={logout}>
+                <button
+                  type="submit"
+                  className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  Log out
+                </button>
+              </form>
+            </div>
           </div>
 
           {profile.bio && (
