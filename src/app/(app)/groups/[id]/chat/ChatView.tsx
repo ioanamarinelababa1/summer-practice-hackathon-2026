@@ -110,7 +110,7 @@ export default function ChatView({
       setInput(trimmed) // restore so the user can retry
     } else {
       setMessages((prev) => {
-        if (prev.some((m) => m.id === result.message.id)) return prev
+        if (prev.some((m) => m.id === result.message?.id)) return prev
         return [
           ...prev,
           {
