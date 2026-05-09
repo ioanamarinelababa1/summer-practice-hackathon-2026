@@ -4,9 +4,9 @@ import { createClient } from '@/lib/supabase/server'
 import { logout } from './actions'
 
 const SKILL_LABELS = {
-  beginner: 'Beginner',
+  beginner:     'Beginner',
   intermediate: 'Intermediate',
-  advanced: 'Advanced',
+  advanced:     'Advanced',
 } as const
 
 const SKILL_BADGE: Record<string, string> = {
@@ -38,58 +38,69 @@ export default async function ProfilePage() {
   const skillKey = profile.skill_level as keyof typeof SKILL_LABELS
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-lg mx-auto space-y-6">
+    <div className="min-h-screen bg-gray-50 py-8 px-4 md:py-12">
+      <div className="max-w-lg mx-auto space-y-4 md:space-y-6">
 
         {/* Header card */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-4">
-              {/* Green avatar */}
-              <div className="h-16 w-16 rounded-full bg-green-600 flex items-center justify-center text-2xl font-bold text-white shrink-0 shadow-sm">
-                {profile.username.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <h1 className="text-xl font-semibold text-gray-900">{profile.username}</h1>
-                {/* Skill badge */}
-                <span className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${SKILL_BADGE[profile.skill_level] ?? 'bg-gray-100 text-gray-500'}`}>
-                  {SKILL_LABELS[skillKey] ?? profile.skill_level}
-                </span>
-              </div>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 md:p-6">
+
+          {/* Avatar + name row — stacked on mobile, side-by-side on md+ */}
+          <div className="flex flex-col items-center text-center gap-3 sm:flex-row sm:items-start sm:text-left sm:gap-4">
+
+            {/* Avatar — bigger on mobile */}
+            <div className="h-20 w-20 shrink-0 rounded-full bg-green-600 flex items-center justify-center text-3xl font-bold text-white shadow-sm sm:h-16 sm:w-16 sm:text-2xl">
+              {profile.username.charAt(0).toUpperCase()}
             </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <Link
-                href="/profile/edit"
-                className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200"
+
+            {/* Name + badge */}
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl font-semibold text-gray-900 leading-tight">
+                {profile.username}
+              </h1>
+              <span
+                className={`mt-1.5 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                  SKILL_BADGE[profile.skill_level] ?? 'bg-gray-100 text-gray-500'
+                }`}
               >
-                Edit
-              </Link>
-              <form action={logout}>
-                <button
-                  type="submit"
-                  className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200"
-                >
-                  Log out
-                </button>
-              </form>
+                {SKILL_LABELS[skillKey] ?? profile.skill_level}
+              </span>
             </div>
           </div>
 
+          {/* Bio */}
           {profile.bio ? (
             <p className="mt-4 text-sm text-gray-700 leading-relaxed">{profile.bio}</p>
           ) : (
             <p className="mt-4 text-sm text-gray-400 italic">No bio yet.</p>
           )}
+
+          {/* Action buttons — full-width stacked on mobile, inline on sm+ */}
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:gap-2">
+            <Link
+              href="/profile/edit"
+              className="flex-1 sm:flex-none rounded-lg border border-gray-300 px-4 py-2.5 sm:px-3 sm:py-1.5 text-sm font-medium text-gray-700 text-center hover:bg-gray-50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+            >
+              Edit profile
+            </Link>
+            <form action={logout} className="flex-1 sm:flex-none">
+              <button
+                type="submit"
+                className="w-full rounded-lg border border-gray-300 px-4 py-2.5 sm:px-3 sm:py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+              >
+                Log out
+              </button>
+            </form>
+          </div>
         </div>
 
         {/* Sports card */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 md:p-6">
           <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">
             Sports
           </h2>
 
           {(!userSports || userSports.length === 0) ? (
-            <div className="text-center py-6">
+            <div className="text-center py-8">
               <p className="text-sm text-gray-500 mb-3">No sports added yet.</p>
               <Link
                 href="/onboarding"
@@ -107,17 +118,23 @@ export default async function ProfilePage() {
                 return (
                   <li
                     key={(sport as { id: string }).id}
-                    className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3 hover:bg-green-50 transition-colors duration-150"
+                    className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3.5 md:py-3 hover:bg-green-50 transition-colors duration-150"
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       {(sport as { icon: string | null }).icon && (
-                        <span className="text-lg">{(sport as { icon: string | null }).icon}</span>
+                        <span className="text-xl md:text-lg">
+                          {(sport as { icon: string | null }).icon}
+                        </span>
                       )}
                       <span className="text-sm font-medium text-gray-800">
                         {(sport as { name: string }).name}
                       </span>
                     </div>
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${SKILL_BADGE[sportSkill] ?? 'bg-gray-100 text-gray-500'}`}>
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        SKILL_BADGE[sportSkill] ?? 'bg-gray-100 text-gray-500'
+                      }`}
+                    >
                       {SKILL_LABELS[sportSkill as keyof typeof SKILL_LABELS] ?? sportSkill}
                     </span>
                   </li>
@@ -126,6 +143,7 @@ export default async function ProfilePage() {
             </ul>
           )}
         </div>
+
       </div>
     </div>
   )
