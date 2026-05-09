@@ -30,5 +30,5 @@ export async function register(_prevState: AuthState, formData: FormData): Promi
     return { error: error.message }
   }
 
-  redirect('/dashboard')
+  redirect('/onboarding')
 }
