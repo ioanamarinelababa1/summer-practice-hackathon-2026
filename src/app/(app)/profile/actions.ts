@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 export type SkillLevel = 'beginner' | 'intermediate' | 'advanced'
 
 export type ProfilePayload = {
+  username?: string
   bio?: string
   skill_level: SkillLevel
   sport_selections: { sport_id: string; skill_level: SkillLevel }[]
@@ -25,6 +26,7 @@ async function writeProfile(
   const { error: profileError } = await supabase
     .from('profiles')
     .update({
+      ...(payload.username ? { username: payload.username } : {}),
       bio: payload.bio ?? null,
       skill_level: payload.skill_level,
     })
