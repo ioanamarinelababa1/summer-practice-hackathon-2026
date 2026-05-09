@@ -10,9 +10,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect('/login')
   }
 
+  const { count } = await supabase
+    .from('notifications')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .eq('read', false)
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <NavBar />
+      <NavBar unreadCount={count ?? 0} />
       <main className="md:pt-14 pb-16 md:pb-0">
         {children}
       </main>

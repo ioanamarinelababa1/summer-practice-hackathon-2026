@@ -3,6 +3,15 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
+
+function adminClient() {
+  return createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } },
+  )
+}
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -77,8 +86,33 @@ export async function joinGroup(
     .insert({ group_id: groupId, user_id: user.id, confirmed: true })
 
   if (error) return { error: error.message }
+
+  // Notify captain (fire-and-forget — don't fail the join if this errors)
+  void notifyCaptainOnJoin(user.id, groupId, eventId)
+
   revalidatePath(`/events/${eventId}`)
   revalidatePath('/events')
+}
+
+async function notifyCaptainOnJoin(joinerId: string, groupId: string, eventId: string) {
+  try {
+    const db = adminClient()
+    const [{ data: group }, { data: event }, { data: profile }] = await Promise.all([
+      db.from('groups').select('captain_id').eq('id', groupId).single(),
+      db.from('events').select('title').eq('id', eventId).single(),
+      db.from('profiles').select('username').eq('id', joinerId).single(),
+    ])
+    if (!group || !event || !profile) return
+    if (group.captain_id === joinerId) return // captain joining their own event
+
+    await db.from('notifications').insert({
+      user_id: group.captain_id,
+      type: 'event_join',
+      message: `${profile.username} joined your event "${event.title}"`,
+    })
+  } catch {
+    // non-critical
+  }
 }
 
 export async function leaveGroup(
