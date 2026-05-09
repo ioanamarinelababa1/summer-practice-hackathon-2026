@@ -3,6 +3,50 @@ import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import { createClient as createUserClient } from '@/lib/supabase/server'
 import JoinLeaveButton from './JoinLeaveButton'
+import VenuePoll from './VenuePoll'
+
+type VenueSuggestion = { name: string; address: string; price: string }
+
+const VENUE_SUGGESTIONS: Record<string, VenueSuggestion[]> = {
+  Football: [
+    { name: 'Teren Sintetic Arena', address: 'Str. Sportivilor 1', price: '80–120 RON/h' },
+    { name: 'Complex Fotbal Nord', address: 'Bd. Unirii 12', price: '60–100 RON/h' },
+    { name: 'Stadionul Municipal', address: 'Str. Gloriei 5', price: '100–150 RON/h' },
+    { name: 'Teren Iarbă Naturală Sud', address: 'Str. Câmpului 3', price: '50–80 RON/h' },
+  ],
+  Basketball: [
+    { name: 'Sala Baschet Centru', address: 'Str. Avram Iancu 2', price: '50–80 RON/h' },
+    { name: 'Teren Baschet Parc', address: 'Parcul Central', price: 'Gratuit' },
+    { name: 'Club Sportiv Baschet', address: 'Str. Sportului 10', price: '60–100 RON/h' },
+  ],
+  Tennis: [
+    { name: 'Tennis Club Elite', address: 'Str. Tenis 3', price: '30–60 RON/h' },
+    { name: 'Terenuri Tenis Sintetic', address: 'Bd. Victoriei 20', price: '40–70 RON/h' },
+    { name: 'Club Sportiv Tenis', address: 'Str. Sportivilor 15', price: '25–50 RON/h' },
+    { name: 'Baza Sportivă Est', address: 'Str. Estului 7', price: '35–55 RON/h' },
+  ],
+  Volleyball: [
+    { name: 'Sala Volei Centru', address: 'Str. Unității 8', price: '40–70 RON/h' },
+    { name: 'Teren Volei Plajă', address: 'Parcul Tineretului', price: '30–50 RON/h' },
+    { name: 'Complex Sportiv Vest', address: 'Str. Vestului 3', price: '50–80 RON/h' },
+  ],
+  Running: [
+    { name: 'Parcul Central', address: 'Centrul Orașului', price: 'Gratuit' },
+    { name: 'Pistă Atletism', address: 'Stadionul Municipal', price: '10–20 RON/vizită' },
+    { name: 'Traseu Riveran', address: 'Lunca Râului', price: 'Gratuit' },
+    { name: 'Parc Dendrologic', address: 'Str. Pădurii 1', price: 'Gratuit' },
+  ],
+  Cycling: [
+    { name: 'Pistă Ciclism Parc', address: 'Parcul Central', price: 'Gratuit' },
+    { name: 'Traseu MTB Nord', address: 'Dealul Cetate', price: 'Gratuit' },
+    { name: 'Velodrom Municipal', address: 'Str. Sportivilor 5', price: '15–30 RON/h' },
+  ],
+  Swimming: [
+    { name: 'Bazin Olympic', address: 'Str. Înot 1', price: '20–35 RON/vizită' },
+    { name: 'Aquapark City', address: 'Str. Apei 10', price: '30–50 RON/vizită' },
+    { name: 'Strand Municipal', address: 'Parcul Strand', price: '15–25 RON/vizită' },
+  ],
+}
 
 function adminClient() {
   return createClient(
@@ -58,7 +102,7 @@ export default async function EventDetailPage({
 
   if (!event) notFound()
 
-  const [{ data: group }, { data: membersData }] = await Promise.all([
+  const [{ data: group }, { data: membersData }, { data: voteOptions }, { data: votesData }] = await Promise.all([
     db
       .from('groups')
       .select('id, captain_id, status, sports(name, icon, min_players, max_players)')
@@ -69,6 +113,15 @@ export default async function EventDetailPage({
       .select('user_id, confirmed, profiles(username)')
       .eq('group_id', event.group_id)
       .order('joined_at', { ascending: true }),
+    db
+      .from('vote_options')
+      .select('id, option_text')
+      .eq('event_id', id)
+      .order('created_at', { ascending: true }),
+    db
+      .from('votes')
+      .select('user_id, option_text')
+      .eq('event_id', id),
   ])
 
   if (!group) notFound()
@@ -197,6 +250,39 @@ export default async function EventDetailPage({
             </ul>
           )}
         </div>
+        {/* Venue Suggestions — captain only */}
+        {isCaptain && VENUE_SUGGESTIONS[sportName] && (
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-4">
+            <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              Venue Suggestions
+            </h2>
+            <ul className="space-y-3">
+              {VENUE_SUGGESTIONS[sportName].map((v) => (
+                <li key={v.name} className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">{v.name}</p>
+                    <p className="text-xs text-gray-400">{v.address}</p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">
+                    {v.price}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Venue Poll */}
+        {(isMember || isCaptain) && (
+          <VenuePoll
+            eventId={id}
+            isCaptain={isCaptain}
+            isMember={isMember}
+            currentUserId={user.id}
+            options={(voteOptions ?? []) as { id: string; option_text: string }[]}
+            votes={(votesData ?? []) as { user_id: string; option_text: string }[]}
+          />
+        )}
       </div>
     </div>
   )
