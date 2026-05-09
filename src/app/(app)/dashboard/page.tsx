@@ -1,16 +1,166 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import TodayPrompt from './TodayPrompt'
+import WeekCalendar, { type DaySlot } from './WeekCalendar'
+
+// ── Date helpers ────────────────────────────────────────────────────────────
+
+function isoDate(offsetDays = 0): string {
+  const d = new Date()
+  d.setDate(d.getDate() + offsetDays)
+  return d.toISOString().split('T')[0]
+}
+
+function formatLabel(dateStr: string, index: number): string {
+  if (index === 0) return 'Tomorrow'
+  const d = new Date(dateStr + 'T00:00:00')
+  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+}
+
+function formatTodayHeading(): string {
+  return new Date().toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
+// ── Sport count types ────────────────────────────────────────────────────────
+
+type SportCount = { id: string; name: string; icon: string | null; count: number }
+
+// ── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function DashboardPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const today = isoDate(0)
+
+  // Dates for the weekly picker (tomorrow + 6 more = 7 days)
+  const weekDates = Array.from({ length: 7 }, (_, i) => isoDate(i + 1))
+
+  // Fetch all data in parallel
+  const [
+    { data: todayRow },
+    { data: weekRows },
+    { data: availableToday },
+  ] = await Promise.all([
+    supabase
+      .from('availability')
+      .select('is_available')
+      .eq('user_id', user.id)
+      .eq('date', today)
+      .maybeSingle(),
+    supabase
+      .from('availability')
+      .select('date, is_available')
+      .eq('user_id', user.id)
+      .in('date', weekDates),
+    supabase
+      .from('availability')
+      .select('user_id')
+      .eq('date', today)
+      .eq('is_available', true)
+      .neq('user_id', user.id),
+  ])
+
+  // Build week slots
+  const availMap = new Map((weekRows ?? []).map((r) => [r.date, r.is_available as boolean]))
+  const weekSlots: DaySlot[] = weekDates.map((date, i) => ({
+    date,
+    label: formatLabel(date, i),
+    isAvailable: availMap.has(date) ? availMap.get(date)! : null,
+  }))
+
+  // Build sport counts from users available today
+  const availableUserIds = (availableToday ?? []).map((r) => r.user_id)
+  let sportCounts: SportCount[] = []
+
+  if (availableUserIds.length > 0) {
+    const { data: userSportsData } = await supabase
+      .from('user_sports')
+      .select('user_id, sport_id, sports(id, name, icon)')
+      .in('user_id', availableUserIds)
+
+    const countMap = new Map<string, SportCount>()
+    for (const row of userSportsData ?? []) {
+      const sport = (Array.isArray(row.sports) ? row.sports[0] : row.sports) as {
+        id: string
+        name: string
+        icon: string | null
+      } | null
+      if (!sport) continue
+      const entry = countMap.get(sport.id)
+      if (entry) {
+        entry.count++
+      } else {
+        countMap.set(sport.id, { id: sport.id, name: sport.name, icon: sport.icon, count: 1 })
+      }
+    }
+    sportCounts = Array.from(countMap.values()).sort((a, b) => b.count - a.count)
+  }
+
+  const todayIsAvailable: boolean | null =
+    todayRow == null ? null : (todayRow.is_available as boolean)
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Welcome</h1>
-        <p className="text-sm text-gray-500">{user.email}</p>
+    <div className="min-h-screen bg-gray-50 py-10 px-4">
+      <div className="max-w-lg mx-auto space-y-6">
+
+        {/* Header */}
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">ShowUp Today</h1>
+          <p className="text-sm text-gray-500 mt-0.5">{formatTodayHeading()}</p>
+        </div>
+
+        {/* Today YES/NO prompt */}
+        <TodayPrompt today={today} initialIsAvailable={todayIsAvailable} />
+
+        {/* Others available today per sport */}
+        {sportCounts.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+            <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+              Others available today
+            </h2>
+            <div className="grid grid-cols-2 gap-3">
+              {sportCounts.map((s) => (
+                <div
+                  key={s.id}
+                  className="flex items-center gap-2 rounded-lg bg-gray-50 px-3 py-2"
+                >
+                  {s.icon && <span className="text-xl">{s.icon}</span>}
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">{s.name}</p>
+                    <p className="text-xs text-gray-500">
+                      {s.count} {s.count === 1 ? 'person' : 'people'}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {sportCounts.length === 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 text-center">
+            <p className="text-sm text-gray-500">No one else has marked themselves available yet.</p>
+          </div>
+        )}
+
+        {/* Weekly availability picker */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+            Your week ahead
+          </h2>
+          <WeekCalendar days={weekSlots} />
+        </div>
+
       </div>
     </div>
   )
