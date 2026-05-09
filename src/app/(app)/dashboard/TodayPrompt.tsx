@@ -49,7 +49,7 @@ export default function TodayPrompt({
         <button
           onClick={() => handleSet(true)}
           disabled={isPending}
-          className="mt-4 text-sm text-gray-700 underline disabled:opacity-50"
+          className="mt-4 text-sm text-green-700 underline disabled:opacity-50"
         >
           Wait, I can show up!
         </button>
@@ -65,7 +65,7 @@ export default function TodayPrompt({
         <button
           onClick={() => handleSet(true)}
           disabled={isPending}
-          className="flex-1 max-w-[160px] rounded-xl bg-gray-900 py-4 text-lg font-bold text-white hover:bg-gray-700 disabled:opacity-50 transition-colors"
+          className="flex-1 max-w-[160px] rounded-xl bg-green-600 py-4 text-lg font-bold text-white hover:bg-green-700 disabled:opacity-50 transition-colors"
         >
           YES
         </button>

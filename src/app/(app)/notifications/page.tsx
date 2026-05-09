@@ -30,7 +30,7 @@ export default async function NotificationsPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
           {unreadCount > 0 && (
-            <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700">
+            <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
               {unreadCount} unread
             </span>
           )}

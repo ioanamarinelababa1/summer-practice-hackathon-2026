@@ -11,6 +11,8 @@ export type EditEventInitial = {
   scheduled_at: string
 }
 
+const INPUT = 'w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors'
+
 export default function EditEventForm({
   eventId,
   groupId,
@@ -74,7 +76,7 @@ export default function EditEventForm({
           required
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900"
+          className={INPUT}
         />
       </div>
 
@@ -89,7 +91,7 @@ export default function EditEventForm({
           required
           value={scheduledAt}
           onChange={(e) => setScheduledAt(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900"
+          className={INPUT}
         />
       </div>
 
@@ -103,7 +105,7 @@ export default function EditEventForm({
           type="text"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900"
+          className={INPUT}
         />
       </div>
 
@@ -117,7 +119,7 @@ export default function EditEventForm({
           type="text"
           value={venueName}
           onChange={(e) => setVenueName(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900"
+          className={INPUT}
         />
       </div>
 
@@ -131,7 +133,7 @@ export default function EditEventForm({
           rows={3}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 resize-none"
+          className={`${INPUT} resize-none`}
         />
       </div>
 
@@ -144,7 +146,7 @@ export default function EditEventForm({
       <button
         type="submit"
         disabled={submitting || !title.trim()}
-        className="w-full rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50 transition-colors"
+        className="w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 transition-colors"
       >
         {submitting ? 'Saving…' : 'Save Changes'}
       </button>

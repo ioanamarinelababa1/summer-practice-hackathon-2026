@@ -159,7 +159,7 @@ export default function ChatView({
               <div
                 className={`max-w-[75%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed ${
                   isMe
-                    ? 'bg-gray-900 text-white rounded-br-sm'
+                    ? 'bg-green-600 text-white rounded-br-sm'
                     : 'bg-white border border-gray-200 text-gray-900 rounded-bl-sm'
                 }`}
               >
@@ -189,12 +189,12 @@ export default function ChatView({
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type a message…"
           disabled={sending}
-          className="flex-1 rounded-full border border-gray-300 bg-gray-50 px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:bg-white disabled:opacity-50 transition-colors"
+          className="flex-1 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:bg-white disabled:opacity-50 transition-colors"
         />
         <button
           type="submit"
           disabled={sending || !input.trim()}
-          className="shrink-0 rounded-full bg-gray-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-40 hover:bg-gray-700 transition-colors"
+          className="shrink-0 rounded-full bg-green-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-40 hover:bg-green-700 transition-colors"
         >
           {sending ? '…' : 'Send'}
         </button>

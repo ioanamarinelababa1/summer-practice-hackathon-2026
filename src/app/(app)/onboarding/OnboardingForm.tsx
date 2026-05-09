@@ -20,6 +20,8 @@ const CITIES = [
   'Târgu-Jiu',
 ]
 
+const INPUT = 'w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors'
+
 export default function OnboardingForm({
   sports,
   currentUsername,
@@ -109,7 +111,7 @@ export default function OnboardingForm({
           required
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+          className={INPUT}
           placeholder="your_username"
         />
       </div>
@@ -124,7 +126,7 @@ export default function OnboardingForm({
             type="button"
             onClick={handleDetectSports}
             disabled={detecting || !bio.trim()}
-            className="text-xs font-medium text-gray-600 border border-gray-300 rounded-md px-2.5 py-1 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="text-xs font-medium text-green-700 border border-green-300 rounded-md px-2.5 py-1 hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {detecting ? 'Detecting…' : 'Auto-detect sports'}
           </button>
@@ -135,7 +137,7 @@ export default function OnboardingForm({
           value={bio}
           onChange={(e) => setBio(e.target.value)}
           placeholder="Tell others a bit about yourself…"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
+          className={`${INPUT} resize-none`}
         />
       </div>
 
@@ -148,7 +150,7 @@ export default function OnboardingForm({
           id="city"
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+          className={INPUT}
         >
           <option value="">Select your city</option>
           {CITIES.map((c) => (
@@ -166,7 +168,7 @@ export default function OnboardingForm({
           id="skill_level"
           value={skillLevel}
           onChange={(e) => setSkillLevel(e.target.value as SkillLevel)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+          className={INPUT}
         >
           {SKILL_LEVELS.map((l) => (
             <option key={l} value={l}>
@@ -190,6 +192,7 @@ export default function OnboardingForm({
                   id={`sport-${sport.id}`}
                   checked={selectedSports.has(sport.id)}
                   onChange={() => toggleSport(sport.id)}
+                  className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
                 />
                 <label htmlFor={`sport-${sport.id}`} className="text-sm text-gray-800 cursor-pointer">
                   {sport.icon && <span className="mr-1">{sport.icon}</span>}
@@ -210,7 +213,7 @@ export default function OnboardingForm({
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50 transition-colors"
+        className="w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 transition-colors"
       >
         {submitting ? 'Saving…' : 'Save and continue'}
       </button>

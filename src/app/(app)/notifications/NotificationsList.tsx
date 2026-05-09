@@ -51,7 +51,7 @@ export default function NotificationsList({ initial }: { initial: Notification[]
             className={`w-full text-left rounded-xl border px-5 py-4 transition-colors ${
               n.read
                 ? 'bg-white border-gray-200 cursor-default'
-                : 'bg-blue-50 border-blue-100 hover:bg-blue-100 cursor-pointer'
+                : 'bg-green-50 border-green-100 hover:bg-green-100 cursor-pointer'
             }`}
           >
             <div className="flex items-start justify-between gap-3">
@@ -61,7 +61,7 @@ export default function NotificationsList({ initial }: { initial: Notification[]
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-xs text-gray-400">{timeAgo(n.created_at)}</span>
                 {!n.read && (
-                  <span className="h-2 w-2 rounded-full bg-blue-500 shrink-0" />
+                  <span className="h-2 w-2 rounded-full bg-green-500 shrink-0" />
                 )}
               </div>
             </div>

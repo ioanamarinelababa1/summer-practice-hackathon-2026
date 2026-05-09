@@ -109,14 +109,14 @@ export default async function GroupDetailPage({
           )}
 
           {isCaptain && (
-            <p className="rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white text-center">
+            <p className="rounded-lg bg-green-600 px-3 py-2 text-xs font-medium text-white text-center">
               You are the captain of this group
             </p>
           )}
 
           <Link
             href={`/groups/${id}/chat`}
-            className="flex items-center justify-center gap-2 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            className="flex items-center justify-center gap-2 w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 transition-colors"
           >
             💬 Open Chat
           </Link>
@@ -152,7 +152,7 @@ export default async function GroupDetailPage({
 
                 <div className="flex items-center gap-2">
                   {m.isCaptain && (
-                    <span className="rounded-full bg-gray-900 px-2.5 py-0.5 text-xs font-medium text-white">
+                    <span className="rounded-full bg-green-600 px-2.5 py-0.5 text-xs font-medium text-white">
                       Captain
                     </span>
                   )}

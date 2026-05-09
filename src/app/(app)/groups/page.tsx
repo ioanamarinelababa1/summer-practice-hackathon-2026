@@ -90,7 +90,7 @@ export default async function GroupsPage() {
             </p>
             <Link
               href="/dashboard"
-              className="inline-block mt-2 text-sm font-medium text-gray-900 underline"
+              className="inline-block mt-2 text-sm font-medium text-green-600 hover:text-green-700 underline"
             >
               Go to dashboard →
             </Link>
@@ -101,7 +101,7 @@ export default async function GroupsPage() {
               <li key={g.id}>
                 <Link
                   href={`/groups/${g.id}`}
-                  className="flex items-center justify-between bg-white rounded-xl border border-gray-200 shadow-sm px-5 py-4 hover:border-gray-400 transition-colors"
+                  className="flex items-center justify-between bg-white rounded-xl border border-gray-200 shadow-sm px-5 py-4 hover:border-green-300 transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {g.sport_icon && (

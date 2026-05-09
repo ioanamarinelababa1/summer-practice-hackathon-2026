@@ -140,7 +140,7 @@ export default async function EventsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Events</h1>
           <Link
             href="/events/create"
-            className="rounded-lg bg-gray-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-700 transition-colors"
+            className="rounded-lg bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 transition-colors"
           >
             + Create
           </Link>
@@ -149,7 +149,7 @@ export default async function EventsPage() {
         {events.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center space-y-3">
             <p className="text-sm text-gray-500">No upcoming events yet.</p>
-            <Link href="/events/create" className="text-sm font-medium text-gray-900 underline">
+            <Link href="/events/create" className="text-sm font-medium text-green-600 hover:text-green-700 underline">
               Create the first one →
             </Link>
           </div>
@@ -193,7 +193,7 @@ export default async function EventsPage() {
 
                 {/* Actions */}
                 <div className="flex items-center justify-between pt-1">
-                  <Link href={`/events/${e.id}`} className="text-sm text-gray-600 hover:text-gray-900">
+                  <Link href={`/events/${e.id}`} className="text-sm text-green-600 hover:text-green-700 font-medium">
                     View details →
                   </Link>
 

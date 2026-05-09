@@ -38,6 +38,8 @@ export type SportOption = {
   current_skill_level?: SkillLevel
 }
 
+const INPUT = 'w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-colors'
+
 // ── Component ────────────────────────────────────────────────────────────────
 
 export default function EditProfileForm({
@@ -99,7 +101,7 @@ export default function EditProfileForm({
           id="bio"
           rows={3}
           placeholder="Tell others a bit about yourself…"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
+          className={`${INPUT} resize-none`}
           {...register('bio')}
         />
         {errors.bio && (
@@ -114,7 +116,7 @@ export default function EditProfileForm({
         </label>
         <select
           id="skill_level"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+          className={INPUT}
           {...register('skill_level')}
         >
           {skillLevels.map((l) => (
@@ -135,7 +137,7 @@ export default function EditProfileForm({
               key={row.sport_id}
               className={`flex items-center gap-3 rounded-lg border px-4 py-3 transition-colors ${
                 row.selected
-                  ? 'border-gray-900 bg-gray-50'
+                  ? 'border-green-500 bg-green-50'
                   : 'border-gray-200 bg-white'
               }`}
             >
@@ -152,7 +154,7 @@ export default function EditProfileForm({
                     shouldDirty: true,
                   })
                 }
-                className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
               />
 
               <label
@@ -166,7 +168,7 @@ export default function EditProfileForm({
               {row.selected && (
                 <select
                   aria-label={`${row.name} skill level`}
-                  className="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  className="rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500/20"
                   {...register(`sports.${idx}.skill_level`)}
                 >
                   {skillLevels.map((l) => (
@@ -203,7 +205,7 @@ export default function EditProfileForm({
         <button
           type="submit"
           disabled={isSubmitting || !isDirty}
-          className="flex-1 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50 transition-colors"
+          className="flex-1 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 transition-colors"
         >
           {isSubmitting ? 'Saving…' : 'Save changes'}
         </button>

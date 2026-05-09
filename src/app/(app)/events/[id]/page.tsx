@@ -186,7 +186,7 @@ export default async function EventDetailPage({
           {isCaptain && (
             <Link
               href={`/events/${id}/edit`}
-              className="block text-center w-full rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="block text-center w-full rounded-lg border border-green-600 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-50 transition-colors"
             >
               Edit Event
             </Link>
@@ -233,7 +233,7 @@ export default async function EventDetailPage({
                   </div>
                   <div className="flex items-center gap-2">
                     {m.isCaptain && (
-                      <span className="rounded-full bg-gray-900 px-2.5 py-0.5 text-xs font-medium text-white">
+                      <span className="rounded-full bg-green-600 px-2.5 py-0.5 text-xs font-medium text-white">
                         Organiser
                       </span>
                     )}
